@@ -3,7 +3,7 @@ import cv2
 import shutil
 
 samples = []
-with open('../data2/driving_log.csv' as csvfile:
+with open('../data2/driving_log.csv') as csvfile:
     reader = csv.reader(csvfile)
     for line in reader:
         files[i].append(line)
