@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 
 files = []
-for i in range(0):
+for i in range(1):
     files.append([])
     with open('../data%s/driving_log.csv' % str(i)) as csvfile:
         reader = csv.reader(csvfile)
@@ -57,6 +57,6 @@ model.add(Dense(10))
 model.add(Dense(1))
 
 model.compile(loss='mse', optimizer='adam')
-model.fit(X_train, y_train, validation_split=0.2, shuffle=True, nb_epoch=4)
+model.fit(X_train, y_train, verbose=1, validation_split=0.2, shuffle=True, epochs=4)
 
 model.save('model.h5')
