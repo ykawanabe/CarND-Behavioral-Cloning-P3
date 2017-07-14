@@ -1,6 +1,5 @@
 import csv
 import cv2
-import numpy as np
 
 files = []
 for i in range(1):
@@ -10,28 +9,55 @@ for i in range(1):
         for line in reader:
             files[i].append(line)
 
-images = []
-measurements = []
+samples = []
 for idx, lines in enumerate(files):
     for line in lines:
+        samples.append(line)
         for i in range(3):
             source_path = line[i]
             filename = source_path.split('/')[-1]
             current_path = '../data' + str(idx) + '/IMG/' + filename
-            image = cv2.imread(current_path)
-            images.append(image)
-            measurement = float(line[3])
-            correction = 0.2
-            if i == 1:
-                measurement + correction
-            elif i == 2:
-                measurement - correction
-            measurements.append(measurement)
-            images.append(cv2.flip(image,1))
-            measurements.append(measurement *-1.0)
+            new_path = '../IMG/' + filename
+            os.rename(current_path, new_path)
 
-X_train = np.array(images)
-y_train = np.array(measurements)
+
+from sklearn.model_selection import train_test_split
+train_samples, validation_samples = train_test_split(samples, test_size=0.2)
+
+import numpy as np
+import sklearn
+
+def generator(samples, batch_size=32):
+    num_samples = len(samples)
+    for offset in range(0, num_samples, batch_size):
+        batch_samples = samples[offset:offset+batch_size]
+
+        images = []
+        measurement = []
+        for batch_sample in batch_samples:
+            for i in range(3):
+                source_path = line[i]
+                filename = source_path.split('/')[-1]
+                current_path = '../IMG/' + filename
+                image = cv2.imread(current_path)
+                images.append(image)
+                measurement = float(line[3])
+                correction = 0.2
+                if i == 1:
+                    measurement + correction
+                elif i == 2:
+                    measurement - correction
+                measurements.append(measurement)
+                images.append(cv2.flip(image,1))
+                measurements.append(measurement *-1.0)
+
+        X_train = np.array(images)
+        y_train = np.array(measurements)
+        yield sklearn.utils.shuffle(X_train, y_train)
+
+
+train_generator = generator(train_samples, batch_size=32)
+validation_generator = generator(validation_samples, batch_size=32)
 
 from keras.models import Sequential
 from keras.layers import Flatten, Dense
@@ -57,6 +83,6 @@ model.add(Dense(10))
 model.add(Dense(1))
 
 model.compile(loss='mse', optimizer='adam')
-model.fit(X_train, y_train, verbose=1, validation_split=0.2, shuffle=True, epochs=4)
-
+# model.fit(X_train, y_train, verbose=1, validation_split=0.2, shuffle=True, epochs=4)
+model.fit_generator(train_generator, samples_per_epoch=len(train_samples), validation_data=validation_generator, nb_val_sample=(validation_samples), epochs=3)
 model.save('model.h5')
