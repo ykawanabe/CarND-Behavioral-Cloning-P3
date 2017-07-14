@@ -6,7 +6,7 @@ samples = []
 with open('../data2/driving_log.csv') as csvfile:
     reader = csv.reader(csvfile)
     for line in reader:
-        files.append(line)
+        samples.append(line)
 
 from sklearn.model_selection import train_test_split
 train_samples, validation_samples = train_test_split(samples, test_size=0.2)
