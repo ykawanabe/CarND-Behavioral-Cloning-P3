@@ -15,21 +15,20 @@ measurements = []
 for idx, lines in enumerate(files):
     for line in lines:
         for i in range(3):
-            for j in range(2):
-                source_path = line[i]
-                filename = source_path.split('/')[-1]
-                current_path = '../data' + str(idx) + '/IMG/' + filename
-                image = cv2.imread(current_path)
-                images.append(image)
-                measurement = float(line[3])
-                correction = 0.2
-                if i == 1:
-                    measurement + correction
-                elif i == 2:
-                    measurement - correction
-                measurements.append(measurement)
-                images.append(cv2.flip(image,1))
-                measurements.append(measurement *-1.0)
+            source_path = line[i]
+            filename = source_path.split('/')[-1]
+            current_path = '../data' + str(idx) + '/IMG/' + filename
+            image = cv2.imread(current_path)
+            images.append(image)
+            measurement = float(line[3])
+            correction = 0.2
+            if i == 1:
+                measurement + correction
+            elif i == 2:
+                measurement - correction
+            measurements.append(measurement)
+            images.append(cv2.flip(image,1))
+            measurements.append(measurement *-1.0)
 
 X_train = np.array(images)
 y_train = np.array(measurements)
