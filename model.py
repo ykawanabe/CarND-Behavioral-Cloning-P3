@@ -3,7 +3,7 @@ import cv2
 import shutil
 
 samples = []
-with open('../data0/driving_log.csv' as csvfile:
+with open('../data2/driving_log.csv' as csvfile:
     reader = csv.reader(csvfile)
     for line in reader:
         files[i].append(line)
@@ -25,7 +25,7 @@ def generator(samples, batch_size=32768):
             for line in batch_samples:
                 source_path = line[i]
                 filename = source_path.split('/')[-1]
-                current_path = '../data0/IMG/' + filename
+                current_path = '../data2/IMG/' + filename
                 image = cv2.imread(current_path)
                 images.append(image)
                 measurement = float(line[3])
