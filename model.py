@@ -3,7 +3,7 @@ import cv2
 import shutil
 
 files = []
-for i in range(1):
+for i in range(2):
     files.append([])
     with open('../data%s/driving_log.csv' % str(i)) as csvfile:
         reader = csv.reader(csvfile)
@@ -27,8 +27,8 @@ train_samples, validation_samples = train_test_split(samples, test_size=0.2)
 
 import numpy as np
 import sklearn
-
-def generator(samples, batch_size=32):
+batch_size = 32 
+def generator(samples, batch_size=batch_size):
     num_samples = len(samples)
     while 1:
         for offset in range(0, num_samples, batch_size):
@@ -57,8 +57,8 @@ def generator(samples, batch_size=32):
             yield sklearn.utils.shuffle(X_train, y_train)
 
 
-train_generator = generator(train_samples, batch_size=32)
-validation_generator = generator(validation_samples, batch_size=32)
+train_generator = generator(train_samples, batch_size=batch_size)
+validation_generator = generator(validation_samples, batch_size=batch_size)
 
 from keras.models import Sequential
 from keras.layers import Flatten, Dense
@@ -85,6 +85,6 @@ model.add(Dense(1))
 
 model.compile(loss='mse', optimizer='adam')
 # model.fit(X_train, y_train, verbose=1, validation_split=0.2, shuffle=True, epochs=4)
-model.fit_generator(train_generator, steps_per_epoch=6*len(train_samples), validation_data=validation_generator, validation_steps=6*(validation_samples), epochs=3)
+model.fit_generator(train_generator, steps_per_epoch=6*len(train_samples), validation_data=validation_generator, validation_steps=6*(validation_samples), epochs=1)
 
 model.save('model.h5')
