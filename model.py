@@ -1,5 +1,6 @@
 import csv
 import cv2
+import shutil
 
 files = []
 for i in range(1):
@@ -18,7 +19,7 @@ for idx, lines in enumerate(files):
             filename = source_path.split('/')[-1]
             current_path = '../data' + str(idx) + '/IMG/' + filename
             new_path = '../IMG/' + filename
-            os.rename(current_path, new_path)
+            #shutil.copy2(current_path, new_path)
 
 
 from sklearn.model_selection import train_test_split
@@ -33,8 +34,8 @@ def generator(samples, batch_size=32):
         batch_samples = samples[offset:offset+batch_size]
 
         images = []
-        measurement = []
-        for batch_sample in batch_samples:
+        measurements = []
+        for line in batch_samples:
             for i in range(3):
                 source_path = line[i]
                 filename = source_path.split('/')[-1]
@@ -50,7 +51,8 @@ def generator(samples, batch_size=32):
                 measurements.append(measurement)
                 images.append(cv2.flip(image,1))
                 measurements.append(measurement *-1.0)
-
+        print(images)
+        print(measurements)
         X_train = np.array(images)
         y_train = np.array(measurements)
         yield sklearn.utils.shuffle(X_train, y_train)
@@ -84,5 +86,5 @@ model.add(Dense(1))
 
 model.compile(loss='mse', optimizer='adam')
 # model.fit(X_train, y_train, verbose=1, validation_split=0.2, shuffle=True, epochs=4)
-model.fit_generator(train_generator, samples_per_epoch=len(train_samples), validation_data=validation_generator, nb_val_sample=(validation_samples), epochs=3)
+model.fit_generator(train_generator, steps_per_epoch=len(train_samples), validation_data=validation_generator, validation_steps=(validation_samples), epochs=3)
 model.save('model.h5')
