@@ -2,32 +2,34 @@ import csv
 import cv2
 import numpy as np
 
-lines = [][]
-for j in range(2):
-    with open('../data'+j+'/driving_log.csv') as csvfile:
+files = []
+for i in range(2):
+    files.append([])
+    with open('../data%s/driving_log.csv' % str(i)) as csvfile:
         reader = csv.reader(csvfile)
         for line in reader:
-            lines[j].append(line)
+            files[i].append(line)
 
 images = []
 measurements = []
-for line in lines:
-    for i in range(3):
-        for j in range(2):
-            source_path = line[j][i]
-            filename = source_path.split('/')[-1]
-            current_path = '../data' + j + '/IMG/' + filename
-            image = cv2.imread(current_path)
-            images.append(image)
-            measurement = float(line[3])
-            correction = 0.2
-            if i == 1:
-                measurement + correction
-            elif i == 2:
-                measurement - correction
-            measurements.append(measurement)
-            images.append(cv2.flip(image,1))
-            measurements.append(measurement *-1.0)
+for idx, lines in enumerate(files):
+    for line in lines:
+        for i in range(3):
+            for j in range(2):
+                source_path = line[i]
+                filename = source_path.split('/')[-1]
+                current_path = '../data' + str(idx) + '/IMG/' + filename
+                image = cv2.imread(current_path)
+                images.append(image)
+                measurement = float(line[3])
+                correction = 0.2
+                if i == 1:
+                    measurement + correction
+                elif i == 2:
+                    measurement - correction
+                measurements.append(measurement)
+                images.append(cv2.flip(image,1))
+                measurements.append(measurement *-1.0)
 
 X_train = np.array(images)
 y_train = np.array(measurements)
