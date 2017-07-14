@@ -2,25 +2,11 @@ import csv
 import cv2
 import shutil
 
-files = []
-for i in range(3):
-    files.append([])
-    with open('../data%s/driving_log.csv' % str(i)) as csvfile:
-        reader = csv.reader(csvfile)
-        for line in reader:
-            files[i].append(line)
-
 samples = []
-for idx, lines in enumerate(files):
-    for line in lines:
-        samples.append(line)
-        for i in range(3):
-            source_path = line[i]
-            filename = source_path.split('/')[-1]
-            current_path = '../data' + str(idx) + '/IMG/' + filename
-            new_path = '../IMG/' + filename
-            #shutil.copy2(current_path, new_path)
-
+with open('../data0/driving_log.csv' as csvfile:
+    reader = csv.reader(csvfile)
+    for line in reader:
+        files[i].append(line)
 
 from sklearn.model_selection import train_test_split
 train_samples, validation_samples = train_test_split(samples, test_size=0.2)
@@ -37,21 +23,13 @@ def generator(samples, batch_size=32768):
             images = []
             measurements = []
             for line in batch_samples:
-                for i in range(3):
-                    source_path = line[i]
-                    filename = source_path.split('/')[-1]
-                    current_path = '../IMG/' + filename
-                    image = cv2.imread(current_path)
-                    images.append(image)
-                    measurement = float(line[3])
-                    correction = 0.2
-                    if i == 1:
-                        measurement + correction
-                    elif i == 2:
-                        measurement - correction
-                    measurements.append(measurement)
-                    images.append(cv2.flip(image,1))
-                    measurements.append(measurement *-1.0)
+                source_path = line[i]
+                filename = source_path.split('/')[-1]
+                current_path = '../data0/IMG/' + filename
+                image = cv2.imread(current_path)
+                images.append(image)
+                measurement = float(line[3])
+                measurements.append(measurement)
             X_train = np.array(images)
             y_train = np.array(measurements)
             yield sklearn.utils.shuffle(X_train, y_train)
