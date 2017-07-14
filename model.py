@@ -52,8 +52,6 @@ def generator(samples, batch_size=32):
                     measurements.append(measurement)
                     images.append(cv2.flip(image,1))
                     measurements.append(measurement *-1.0)
-            print(images)
-            print(measurements)
             X_train = np.array(images)
             y_train = np.array(measurements)
             yield sklearn.utils.shuffle(X_train, y_train)
