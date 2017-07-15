@@ -3,26 +3,11 @@ import cv2
 import shutil
 import scipy.misc
 
-files = []
-for i in range(1):
-    files.append([])
-    with open('../data%s/driving_log.csv' % str(i)) as csvfile:
-        reader = csv.reader(csvfile)
-        for line in reader:
-            files[i].append(line)
-
 samples = []
-for idx, lines in enumerate(files):
-    for line in lines:
+with open('../data0/driving_log.csv') as csvfile:
+    reader = csv.reader(csvfile)
+    for line in reader:
         samples.append(line)
-        for i in range(1):
-            source_path = line[i]
-            filename = source_path.split('/')[-1]
-            current_path = '../data' + str(idx) + '/IMG/' + filename
-            image = cv2.imread(current_path)
-            new_path = '../IMG/' + filename
-            shutil.copy2(current_path, new_path)
-
 
 from sklearn.model_selection import train_test_split
 train_samples, validation_samples = train_test_split(samples, test_size=0.2)
@@ -42,7 +27,7 @@ def generator(samples, batch_size=BATCH_SIZE):
                 for i in range(3):
                     source_path = line[i]
                     filename = source_path.split('/')[-1]
-                    current_path = '../IMG/' + filename
+                    current_path = '../data0/IMG/' + filename
                     image = cv2.imread(current_path)
                     image = image[60:140, 0:320]
                     image = scipy.misc.imresize(image, (64, 64))
