@@ -30,7 +30,7 @@ train_samples, validation_samples = train_test_split(samples, test_size=0.2)
 
 import numpy as np
 import sklearn
-batch_size = 32
+batch_size = 128
 def generator(samples, batch_size=batch_size):
     num_samples = len(samples)
     while 1:
@@ -87,6 +87,6 @@ model.add(Dense(1))
 
 model.compile(loss='mse', optimizer='adam')
 # model.fit(X_train, y_train, verbose=1, validation_split=0.2, shuffle=True, epochs=4)
-model.fit_generator(train_generator, steps_per_epoch=6*len(train_samples), validation_data=validation_generator, validation_steps=6*(validation_samples), epochs=1)
+model.fit_generator(train_generator, steps_per_epoch=6*len(train_samples), validation_data=validation_generator, validation_steps=6*(validation_samples), epochs=3)
 
 model.save('model.h5')
