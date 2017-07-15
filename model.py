@@ -3,7 +3,7 @@ import cv2
 import shutil
 
 files = []
-for i in range(2):
+for i in range(3):
     files.append([])
     with open('../data%s/driving_log.csv' % str(i)) as csvfile:
         reader = csv.reader(csvfile)
@@ -18,8 +18,11 @@ for idx, lines in enumerate(files):
             source_path = line[i]
             filename = source_path.split('/')[-1]
             current_path = '../data' + str(idx) + '/IMG/' + filename
+            image = cv2.imread(current_path)
+            crop_image = image[50:140, 0:320]
+            small_image = cv2.resize(crop_image, (0,0), fx=0.5, fy=0.5)
             new_path = '../IMG/' + filename
-            shutil.copy2(current_path, new_path)
+            cv2.imwrite(new_path,small_image)
 
 
 from sklearn.model_selection import train_test_split
@@ -27,7 +30,7 @@ train_samples, validation_samples = train_test_split(samples, test_size=0.2)
 
 import numpy as np
 import sklearn
-batch_size = 32 
+batch_size = 32
 def generator(samples, batch_size=batch_size):
     num_samples = len(samples)
     while 1:
@@ -70,13 +73,12 @@ from keras.layers import Cropping2D
 # from matplotlib.pyplot as plt
 
 model = Sequential()
-model.add(Cropping2D(cropping=((50,20),(0,0)), input_shape=(160,320,3)))
-model.add(Lambda(lambda x: (x / 255.0) - 0.5))
-model.add(Conv2D(24, (5, 5), activation="relu", strides=(2, 2)))
-model.add(Conv2D(36, (5, 5), activation="relu", strides=(2, 2)))
-model.add(Conv2D(48, (5, 5), activation="relu", strides=(2, 2)))
-model.add(Conv2D(64, (3, 3), activation="relu"))
-model.add(Conv2D(64, (3, 3), activation="relu"))
+model.add(Lambda(lambda x: (x / 255.0) - 0.5, input_shape=(45,160,3)))
+model.add(Conv2D(24, (5, 5), border_mode='valid', activation="relu", strides=(2, 2)))
+model.add(Conv2D(36, (5, 5), border_mode='valid', activation="relu", strides=(2, 2)))
+model.add(Conv2D(48, (5, 5), border_mode='valid', activation="relu", strides=(2, 2)))
+model.add(Conv2D(64, (3, 3), border_mode='same', activation="relu"))
+model.add(Conv2D(64, (3, 3), border_mode='valid', activation="relu"))
 model.add(Flatten())
 model.add(Dense(100))
 model.add(Dense(50))
