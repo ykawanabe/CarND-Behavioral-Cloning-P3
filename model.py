@@ -98,6 +98,6 @@ model.add(Dense(1))
 
 model.compile(loss='mse', optimizer='adam')
 # model.fit(X_train, y_train, verbose=1, validation_split=0.2, shuffle=True, epochs=4)
-model.fit_generator(train_generator, steps_per_epoch=6*len(train_samples), validation_data=validation_generator, validation_steps=6*(validation_samples), epochs=3)
+model.fit_generator(train_generator, steps_per_epoch=6*len(train_samples), validation_data=validation_generator, validation_steps=6*len(validation_samples), epochs=3)
 
 model.save('model.h5')
