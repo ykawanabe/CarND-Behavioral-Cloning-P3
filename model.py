@@ -20,10 +20,7 @@ for idx, lines in enumerate(files):
             filename = source_path.split('/')[-1]
             current_path = '../data' + str(idx) + '/IMG/' + filename
             image = cv2.imread(current_path)
-            crop_image = image[40:140,0:320]
-            processed = scipy.misc.imresize(crop_image, (64, 64))
             new_path = '../IMG/' + filename
-            cv2.imwrite(new_path, processed)
             shutil.copy2(current_path, new_path)
 
 
@@ -47,6 +44,8 @@ def generator(samples, batch_size=BATCH_SIZE):
                     filename = source_path.split('/')[-1]
                     current_path = '../IMG/' + filename
                     image = cv2.imread(current_path)
+                    crop_image = image[40:140,0:320]
+                    processed = scipy.misc.imresize(crop_image, (64, 64))
                     images.append(image)
                     measurement = float(line[3])
                     correction = 0.2
