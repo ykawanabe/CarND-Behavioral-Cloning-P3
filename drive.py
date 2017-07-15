@@ -61,8 +61,14 @@ def telemetry(sid, data):
         imgString = data["image"]
         image = Image.open(BytesIO(base64.b64decode(imgString)))
         image_array = np.asarray(image)
-        steering_angle = float(model.predict(image_array[None, :, :, :], batch_size=1))
 
+        crop_image = image[40:140,:,:]
+        image_size = (64, 64)
+        image = imresize(image, size=image_size)
+        transformed_image_array = image[None, :, :, :]
+        transformed_image_array = (transformed_image_array.astype(np.float32) - 128.) / 128.
+
+        steering_angle = float(model.predict(transformed_image_array, batch_size=1))
         throttle = controller.update(float(speed))
 
         print(steering_angle, throttle)

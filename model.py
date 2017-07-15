@@ -1,9 +1,10 @@
 import csv
 import cv2
 import shutil
+import scipy.misc
 
 files = []
-for i in range(3):
+for i in range(1):
     files.append([])
     with open('../data%s/driving_log.csv' % str(i)) as csvfile:
         reader = csv.reader(csvfile)
@@ -14,12 +15,16 @@ samples = []
 for idx, lines in enumerate(files):
     for line in lines:
         samples.append(line)
-        for i in range(3):
+        for i in range(1):
             source_path = line[i]
             filename = source_path.split('/')[-1]
             current_path = '../data' + str(idx) + '/IMG/' + filename
+            image = cv2.imread(current_path)
+            crop_image = image[40:140,:,:]
+            processed = scipy.misc.imresize(crop_image, (64, 64))
             new_path = '../IMG/' + filename
-            shutil.copy2(current_path, new_path)
+            cv2.imwrite(new_path, processed)
+            # shutil.copy2(current_path, new_path)
 
 
 from sklearn.model_selection import train_test_split
@@ -27,8 +32,8 @@ train_samples, validation_samples = train_test_split(samples, test_size=0.2)
 
 import numpy as np
 import sklearn
-batch_size = 128
-def generator(samples, batch_size=batch_size):
+BATCH_SIZE = 1024
+def generator(samples, batch_size=BATCH_SIZE):
     num_samples = len(samples)
     while 1:
         for offset in range(0, num_samples, batch_size):
@@ -57,8 +62,8 @@ def generator(samples, batch_size=batch_size):
             yield sklearn.utils.shuffle(X_train, y_train)
 
 
-train_generator = generator(train_samples, batch_size=batch_size)
-validation_generator = generator(validation_samples, batch_size=batch_size)
+train_generator = generator(train_samples, batch_size=BATCH_SIZE)
+validation_generator = generator(validation_samples, batch_size=BATCH_SIZE)
 
 from keras.models import Sequential
 from keras.layers import Flatten, Dense
@@ -70,14 +75,17 @@ from keras.layers import Cropping2D
 # from keras.models import Model
 # from matplotlib.pyplot as plt
 
+col, row, ch = 64, 64, 3
+
 model = Sequential()
-model.add(Cropping2D(cropping=((50,20),(0,0)), input_shape=(160,320,3)))
-model.add(Lambda(lambda x: (x / 255.0) - 0.5))
-model.add(Conv2D(24, (5, 5), border_mode='valid', activation="relu", strides=(2, 2)))
-model.add(Conv2D(36, (5, 5), border_mode='valid', activation="relu", strides=(2, 2)))
-model.add(Conv2D(48, (5, 5), border_mode='valid', activation="relu", strides=(2, 2)))
-model.add(Conv2D(64, (3, 3), border_mode='same', activation="relu"))
-model.add(Conv2D(64, (3, 3), border_mode='valid', activation="relu"))
+model.add(Lambda(lambda x: (x / 255.0) - 0.5,
+        input_shape=(col, row, ch),
+        output_shape=(col, row, ch)))
+model.add(Conv2D(24, (5, 5), padding='valid', activation="relu", strides=(2, 2)))
+model.add(Conv2D(36, (5, 5), padding='valid', activation="relu", strides=(2, 2)))
+model.add(Conv2D(48, (5, 5), padding='valid', activation="relu", strides=(2, 2)))
+model.add(Conv2D(64, (3, 3), padding='same', activation="relu"))
+model.add(Conv2D(64, (3, 3), padding='valid', activation="relu"))
 model.add(Flatten())
 model.add(Dense(1164))
 model.add(Dropout(.5))
