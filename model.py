@@ -18,11 +18,8 @@ for idx, lines in enumerate(files):
             source_path = line[i]
             filename = source_path.split('/')[-1]
             current_path = '../data' + str(idx) + '/IMG/' + filename
-            image = cv2.imread(current_path)
-            crop_image = image[50:140, 0:320]
-            small_image = cv2.resize(crop_image, (0,0), fx=0.5, fy=0.5)
             new_path = '../IMG/' + filename
-            cv2.imwrite(new_path,small_image)
+            shutil.copy2(current_path, new_path)
 
 
 from sklearn.model_selection import train_test_split
@@ -65,7 +62,8 @@ validation_generator = generator(validation_samples, batch_size=batch_size)
 
 from keras.models import Sequential
 from keras.layers import Flatten, Dense
-from keras.layers import Lambda
+from keras.layers import Lambda, Dropout
+from keras.layers import Reshape
 from keras.layers.convolutional import Conv2D
 from keras.layers.pooling import MaxPooling2D
 from keras.layers import Cropping2D
@@ -73,15 +71,20 @@ from keras.layers import Cropping2D
 # from matplotlib.pyplot as plt
 
 model = Sequential()
-model.add(Lambda(lambda x: (x / 255.0) - 0.5, input_shape=(45,160,3)))
+model.add(Cropping2D(cropping=((50,20),(0,0)), input_shape=(160,320,3)))
+model.add(Lambda(lambda x: (x / 255.0) - 0.5))
 model.add(Conv2D(24, (5, 5), border_mode='valid', activation="relu", strides=(2, 2)))
 model.add(Conv2D(36, (5, 5), border_mode='valid', activation="relu", strides=(2, 2)))
 model.add(Conv2D(48, (5, 5), border_mode='valid', activation="relu", strides=(2, 2)))
 model.add(Conv2D(64, (3, 3), border_mode='same', activation="relu"))
 model.add(Conv2D(64, (3, 3), border_mode='valid', activation="relu"))
 model.add(Flatten())
+model.add(Dense(1164))
+model.add(Dropout(.5))
 model.add(Dense(100))
+model.add(Dropout(.2))
 model.add(Dense(50))
+model.add(Dropout(.1))
 model.add(Dense(10))
 model.add(Dense(1))
 
