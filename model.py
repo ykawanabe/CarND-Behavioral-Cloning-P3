@@ -7,14 +7,14 @@ samples = []
 with open('../data/driving_log.csv') as csvfile:
     reader = csv.reader(csvfile)
     for line in reader:
-        samples.append(line)
+        samples.extend([line])
 
 from sklearn.model_selection import train_test_split
 train_samples, validation_samples = train_test_split(samples, test_size=0.2)
 
 import numpy as np
 import sklearn
-BATCH_SIZE = 1024
+BATCH_SIZE = 16384
 def generator(samples, batch_size=BATCH_SIZE):
     num_samples = len(samples)
     while 1:
@@ -31,16 +31,16 @@ def generator(samples, batch_size=BATCH_SIZE):
                     image = cv2.imread(current_path)
                     image = image[60:140, 0:320]
                     image = scipy.misc.imresize(image, (64, 64))
-                    images.append(image)
+                    images.extend([image])
                     measurement = float(line[3])
                     correction = 0.2
                     if i == 1:
                         measurement + correction
                     elif i == 2:
                         measurement - correction
-                    measurements.append(measurement)
-                    images.append(cv2.flip(image,1))
-                    measurements.append(measurement *-1.0)
+                    measurements.extend([measurement])
+                    images.extend([cv2.flip(image,1)])
+                    measurements.extend([measurement *-1.0])
             X_train = np.array(images)
             y_train = np.array(measurements)
             yield sklearn.utils.shuffle(X_train, y_train)
