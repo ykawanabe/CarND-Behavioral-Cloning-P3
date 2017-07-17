@@ -28,8 +28,8 @@ def generator(samples, batch_size=BATCH_SIZE):
                     filename = source_path.split('/')[-1]
                     current_path = '../data/IMG/' + filename
                     image = cv2.imread(current_path)
-                    image = image[60:140, 0:320]
-                    image = scipy.misc.imresize(image, (64, 64))
+                    # image = image[60:140, 0:320]
+                    # image = scipy.misc.imresize(image, (64, 64))
                     images.extend([image])
                     measurement = float(line[3])
                     measurements.extend([measurement])
@@ -56,9 +56,8 @@ from keras.layers import Cropping2D
 col, row, ch = 64, 64, 3
 
 model = Sequential()
-model.add(Lambda(lambda x: (x / 255.0) - 0.5,
-        input_shape=(col, row, ch),
-        output_shape=(col, row, ch)))
+model.add(Lambda(lambda x: x/ 255.0 - 0.5, input_shape=(160, 320, 3)))
+model.add(Cropping2D(cropping=((70,25),(0,0))))
 model.add(Conv2D(24, (5, 5), padding='valid', activation="relu", strides=(2, 2)))
 model.add(Conv2D(36, (5, 5), padding='valid', activation="relu", strides=(2, 2)))
 model.add(Conv2D(48, (5, 5), padding='valid', activation="relu", strides=(2, 2)))
