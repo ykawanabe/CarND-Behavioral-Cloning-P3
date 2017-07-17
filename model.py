@@ -14,7 +14,7 @@ train_samples, validation_samples = train_test_split(samples, test_size=0.2)
 
 import numpy as np
 import sklearn
-BATCH_SIZE = 16384
+BATCH_SIZE = 1024
 def generator(samples, batch_size=BATCH_SIZE):
     num_samples = len(samples)
     while 1:
