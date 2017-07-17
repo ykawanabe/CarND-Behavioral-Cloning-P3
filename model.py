@@ -14,7 +14,7 @@ train_samples, validation_samples = train_test_split(samples, test_size=0.2)
 
 import numpy as np
 import sklearn
-BATCH_SIZE = 16384
+BATCH_SIZE = 128
 def generator(samples, batch_size=BATCH_SIZE):
     num_samples = len(samples)
     while 1:
@@ -33,7 +33,7 @@ def generator(samples, batch_size=BATCH_SIZE):
                     image = scipy.misc.imresize(image, (64, 64))
                     images.extend([image])
                     measurement = float(line[3])
-                    correction = 0.2
+                    correction = 0.27
                     if i == 1:
                         measurement + correction
                     elif i == 2:
@@ -82,6 +82,6 @@ model.add(Dense(1))
 
 model.compile(loss='mse', optimizer='adam')
 # model.fit(X_train, y_train, verbose=1, validation_split=0.2, shuffle=True, epochs=4)
-model.fit_generator(train_generator, steps_per_epoch=6*len(train_samples), validation_data=validation_generator, validation_steps=6*len(validation_samples), epochs=3)
+model.fit_generator(train_generator, steps_per_epoch=6*len(train_samples), validation_data=validation_generator, validation_steps=6*len(validation_samples), epochs=1)
 
 model.save('model.h5')
