@@ -2,19 +2,46 @@ import csv
 import cv2
 import shutil
 import scipy.misc
+import random
+import numpy as np
+import sklearn
+from sklearn.model_selection import train_test_split
 
-samples = []
+BATCH_SIZE = 128
+TURN_CORRECTION = 0.25
+
+lines = []
 with open('../data/driving_log.csv') as csvfile:
     reader = csv.reader(csvfile)
     for line in reader:
-        samples.extend([line])
+        lines.extend([line])
 
-from sklearn.model_selection import train_test_split
-train_samples, validation_samples = train_test_split(samples, test_size=0.2)
+data = []
+for line in lines:
+        source_path = line[0]
+        filename = source_path.split('/')[-1]
+        current_path = '../data/IMG/' + filename
+        image = cv2.imread(current_path)
+        measurement = float(line[3])
 
-import numpy as np
-import sklearn
-BATCH_SIZE = 128
+        # Recovery data right turn
+        if measurement > 0.15:
+            filename = line[1].split('/')[-1]
+            current_path = '../data/IMG/' + filename
+            image = cv2.imread(current_path)
+            measurement = float(line[3]) + TURN_CORRECTION
+
+        # Recovery data left turn
+        if measurement < 0.15:
+            filename = line[2].split('/')[-1]
+            current_path = '../data/IMG/' + filename
+            image = cv2.imread(current_path)
+            measurement = float(line[3]) + TURN_CORRECTION
+
+        data.extend([(image, measurement)])
+
+
+
 def generator(samples, batch_size=BATCH_SIZE):
     num_samples = len(samples)
     while 1:
@@ -23,23 +50,18 @@ def generator(samples, batch_size=BATCH_SIZE):
 
             images = []
             measurements = []
-            for line in batch_samples:
-                    source_path = line[0]
-                    filename = source_path.split('/')[-1]
-                    current_path = '../data/IMG/' + filename
-                    image = cv2.imread(current_path)
-                    # image = image[60:140, 0:320]
-                    # image = scipy.misc.imresize(image, (64, 64))
+            for sample in batch_samples:
+                    image = sample[0]
+                    measurement = sample[1]
                     images.extend([image])
-                    measurement = float(line[3])
                     measurements.extend([measurement])
-                    images.extend([cv2.flip(image,1)])
-                    measurements.extend([measurement *-1.0])
+
             X_train = np.array(images)
             y_train = np.array(measurements)
             yield sklearn.utils.shuffle(X_train, y_train)
 
 
+train_samples, validation_samples = train_test_split(data, test_size=0.2)
 train_generator = generator(train_samples, batch_size=BATCH_SIZE)
 validation_generator = generator(validation_samples, batch_size=BATCH_SIZE)
 
@@ -75,6 +97,6 @@ model.add(Dense(1))
 
 model.compile(loss='mse', optimizer='adam')
 # model.fit(X_train, y_train, verbose=1, validation_split=0.2, shuffle=True, epochs=4)
-model.fit_generator(train_generator, steps_per_epoch=6*len(train_samples), validation_data=validation_generator, validation_steps=6*len(validation_samples), epochs=3)
+model.fit_generator(train_generator, steps_per_epoch=len(train_samples), validation_data=validation_generator, validation_steps=len(validation_samples), epochs=1)
 
 model.save('model.h5')
