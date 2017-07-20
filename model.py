@@ -36,7 +36,7 @@ for line in lines:
             filename = line[2].split('/')[-1]
             current_path = '../data/IMG/' + filename
             image = cv2.imread(current_path)
-            measurement = float(line[3]) + TURN_CORRECTION
+            measurement = float(line[3]) - TURN_CORRECTION
 
         data.extend([(image, measurement)])
 
