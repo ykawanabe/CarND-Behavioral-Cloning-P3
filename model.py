@@ -8,7 +8,7 @@ import sklearn
 from sklearn.model_selection import train_test_split
 
 BATCH_SIZE = 128
-TURN_CORRECTION = 0.25
+TURN_CORRECTION = 0.20
 
 lines = []
 with open('../data/driving_log.csv') as csvfile:
@@ -51,7 +51,7 @@ def generator(samples, batch_size=BATCH_SIZE):
             images = []
             measurements = []
             for sample in batch_samples:
-                    image = sample[0]
+                    image = crop_resize(random_brightness(sample[0]))
                     measurement = sample[1]
                     images.extend([image])
                     measurements.extend([measurement])
@@ -60,6 +60,16 @@ def generator(samples, batch_size=BATCH_SIZE):
             y_train = np.array(measurements)
             yield sklearn.utils.shuffle(X_train, y_train)
 
+def random_brightness(image):
+    hsv = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
+    rand = random.uniform(0.3,1.0)
+    hsv[:,:,2] = rand*hsv[:,:,2]
+    new_img = cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB)
+    return new_img
+
+def crop_resize(image):
+  cropped = cv2.resize(image[60:140,:], (64,64))
+  return cropped
 
 train_samples, validation_samples = train_test_split(data, test_size=0.2)
 train_generator = generator(train_samples, batch_size=BATCH_SIZE)
@@ -78,8 +88,9 @@ from keras.layers import Cropping2D
 col, row, ch = 64, 64, 3
 
 model = Sequential()
-model.add(Lambda(lambda x: x/ 255.0 - 0.5, input_shape=(160, 320, 3)))
-model.add(Cropping2D(cropping=((70,25),(0,0))))
+model.add(Lambda(lambda x: (x / 255.0) - 0.5,
+        input_shape=(col, row, ch),
+        output_shape=(col, row, ch)))
 model.add(Conv2D(24, (5, 5), padding='valid', activation="relu", strides=(2, 2)))
 model.add(Conv2D(36, (5, 5), padding='valid', activation="relu", strides=(2, 2)))
 model.add(Conv2D(48, (5, 5), padding='valid', activation="relu", strides=(2, 2)))
