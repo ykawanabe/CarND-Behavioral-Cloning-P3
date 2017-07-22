@@ -40,18 +40,15 @@ for line in lines:
 
         data.extend([(image, measurement)])
 
-
-
 def generator(samples, batch_size=BATCH_SIZE):
     num_samples = len(samples)
     while 1:
         for offset in range(0, num_samples, batch_size):
             batch_samples = samples[offset:offset+batch_size]
-
             images = []
             measurements = []
             for sample in batch_samples:
-                    image = crop_resize(random_brightness(sample[0]))
+                    image = crop_resize(random_brightness(sample[0])
                     measurement = sample[1]
                     images.extend([image])
                     measurements.extend([measurement])
@@ -108,6 +105,6 @@ model.add(Dense(1))
 
 model.compile(loss='mse', optimizer='adam')
 # model.fit(X_train, y_train, verbose=1, validation_split=0.2, shuffle=True, epochs=4)
-model.fit_generator(train_generator, steps_per_epoch=len(train_samples), validation_data=validation_generator, validation_steps=len(validation_samples), epochs=1)
+model.fit_generator(train_generator, steps_per_epoch=len(train_samples), validation_data=validation_generator, validation_steps=len(validation_samples), epochs=3)
 
 model.save('model.h5')

@@ -1,13 +1,18 @@
-2017-07-17 05:04:35.031770: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.1 instructions, but these are available on your machine and could speed up CPU computations.
-2017-07-17 05:04:35.031822: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.2 instructions, but these are available on your machine and could speed up CPU computations.
-2017-07-17 05:04:35.031833: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use AVX instructions, but these are available on your machine and could speed up CPU computations.
-2017-07-17 05:04:35.480377: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:901] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
-2017-07-17 05:04:35.480628: I tensorflow/core/common_runtime/gpu/gpu_device.cc:887] Found device 0 with properties: 
+2017-07-20 07:10:46.835603: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.1 instructions, but these are available on your machine and could speed up CPU computations.
+2017-07-20 07:10:46.835669: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.2 instructions, but these are available on your machine and could speed up CPU computations.
+2017-07-20 07:10:46.835679: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use AVX instructions, but these are available on your machine and could speed up CPU computations.
+2017-07-20 07:10:47.293382: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:901] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2017-07-20 07:10:47.293641: I tensorflow/core/common_runtime/gpu/gpu_device.cc:887] Found device 0 with properties: 
 name: GRID K520
 major: 3 minor: 0 memoryClockRate (GHz) 0.797
 pciBusID 0000:00:03.0
 Total memory: 3.94GiB
 Free memory: 3.91GiB
-2017-07-17 05:04:35.480650: I tensorflow/core/common_runtime/gpu/gpu_device.cc:908] DMA: 0 
-2017-07-17 05:04:35.480660: I tensorflow/core/common_runtime/gpu/gpu_device.cc:918] 0:   Y 
-2017-07-17 05:04:35.480671: I tensorflow/core/common_runtime/gpu/gpu_device.cc:977] Creating TensorFlow device (/gpu:0) -> (device: 0, name: GRID K520, pci bus id: 0000:00:03.0)
+2017-07-20 07:10:47.293669: I tensorflow/core/common_runtime/gpu/gpu_device.cc:908] DMA: 0 
+2017-07-20 07:10:47.293679: I tensorflow/core/common_runtime/gpu/gpu_device.cc:918] 0:   Y 
+2017-07-20 07:10:47.293692: I tensorflow/core/common_runtime/gpu/gpu_device.cc:977] Creating TensorFlow device (/gpu:0) -> (device: 0, name: GRID K520, pci bus id: 0000:00:03.0)
+Using TensorFlow backend.
+Exception ignored in: <bound method BaseSession.__del__ of <tensorflow.python.client.session.Session object at 0x7f91e18eb9e8>>
+Traceback (most recent call last):
+  File "/home/carnd/anaconda3/lib/python3.5/site-packages/tensorflow/python/client/session.py", line 587, in __del__
+TypeError: 'NoneType' object is not callable
